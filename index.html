@@ -201,6 +201,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease;
+      position: relative;
     }
     .chart-container:hover,
     .data-table-container:hover {
@@ -289,11 +290,13 @@
         max-width: 100%;
         margin: 10px;
         padding: 15px;
+        /* Tetapkan tinggi tetap untuk grafik agar tidak terkompres */
+        height: 300px;
       }
-      /* Pastikan canvas responsif */
+      /* Pastikan canvas responsif dan mengisi container */
       canvas {
         width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
       }
       /* Atur ulang ukuran kartu KPI */
       .card {
@@ -876,6 +879,7 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false, // Mengizinkan grafik mengisi penuh container
             animation: { duration: 1500 },
             plugins: {
               tooltip: {
@@ -888,7 +892,12 @@
             },
             scales: {
               x: {
-                title: { display: true, text: filterBulan ? 'Cabang (Bulan ' + filterBulan + ')' : 'Cabang-Bulan' }
+                title: { display: true, text: filterBulan ? 'Cabang (Bulan ' + filterBulan + ')' : 'Cabang-Bulan' },
+                ticks: {
+                  autoSkip: true,
+                  maxRotation: 45,
+                  minRotation: 45
+                }
               },
               y: {
                 title: { display: true, text: 'Penjualan' }
@@ -1110,11 +1119,8 @@
     }
     
     // Update Tabel Pertumbuhan Cabang dengan Persentase
-    // Data hanya akan ditampilkan jika penjualan bulan sebelumnya dan penjualan bulan ini lebih dari 1
-    // Filter khusus berdasarkan cabang juga diterapkan (jika dipilih)
     function updateGrowthTable(dsData) {
       var branchMonthlySales = {};
-      // Hitung total penjualan per cabang per bulan
       for (var i = 1; i < dsData.length; i++){
         var row = dsData[i],
             month = parseInt(row[41]);
@@ -1131,19 +1137,15 @@
       
       var tbody = document.getElementById("growth-table-body");
       tbody.innerHTML = "";
-      // Untuk setiap cabang, hitung dan tampilkan pertumbuhan tiap bulan
       Object.keys(branchMonthlySales).forEach(function(branch) {
-        // Jika filter cabang diaktifkan dan nama cabang tidak sesuai, lewati
         if (branchFilter && branch !== branchFilter) {
           return;
         }
         var salesArray = branchMonthlySales[branch];
-        // Mulai dari bulan kedua (indeks 1)
         for (var m = 1; m < 12; m++){
           var prevSales = salesArray[m - 1],
               currSales = salesArray[m],
               growth = "N/A";
-          // Jika penjualan bulan sebelumnya atau penjualan bulan ini ≤ 1, lewati data tersebut
           if (prevSales <= 1 || currSales <= 1) {
             continue;
           }
@@ -1183,21 +1185,16 @@
     
     $(document).ready(function() {
       getDataFromSheet();
-      // Filter Bulan
       $('#filter-bulan').on('change', function() {
         getDataFromSheet();
       });
-      // Filter khusus untuk Tabel Pertumbuhan berdasarkan cabang
       $('#filter-branch-growth').on('change', function() {
-        // Gunakan data global untuk memfilter Tabel Pertumbuhan
         updateGrowthTable(globalDsData);
       });
-      // Menu Hamburger untuk Mobile
       $('#hamburger').on('click', function() {
         $('#nav-menu').toggleClass('active');
         $(this).toggleClass('open');
       });
-      // Optional: Real-Time Updates
       // setInterval(getDataFromSheet, 60000);
     });
   </script>
