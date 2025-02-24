@@ -281,6 +281,41 @@
       color: #fff;
       font-size: 12px;
     }
+    
+    /* --- Penyesuaian Tambahan untuk Mobile --- */
+    @media (max-width: 768px) {
+      .chart-container,
+      .data-table-container {
+        max-width: 100%;
+        margin: 10px;
+        padding: 15px;
+      }
+      /* Pastikan canvas responsif */
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+      }
+      /* Atur ulang ukuran kartu KPI */
+      .card {
+        width: 45%;
+        margin-bottom: 10px;
+      }
+    }
+    @media (max-width: 480px) {
+      .card {
+        width: 100%;
+      }
+      /* Tabel bisa di-scroll secara horizontal jika diperlukan */
+      .data-table-container table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+      }
+      .filters select {
+        width: 100%;
+        margin: 5px 0;
+      }
+    }
   </style>
 </head>
 <body>
